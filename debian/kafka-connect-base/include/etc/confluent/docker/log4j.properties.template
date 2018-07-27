@@ -1,13 +1,24 @@
 
-log4j.rootLogger={{ env["CONNECT_LOG4J_ROOT_LOGLEVEL"] | default('INFO') }}, stdout
+log4j.rootLogger={{ env["CONNECT_LOG4J_ROOT_LOGLEVEL"] | default('INFO') }}, stdout, file
 
 log4j.appender.stdout=org.apache.log4j.ConsoleAppender
 log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
 log4j.appender.stdout.layout.ConversionPattern=[%d] %p %m (%c)%n
 
+# Define the file appender
+log4j.appender.file=org.apache.log4j.FileAppender
+
+# Set the name of the file
+log4j.appender.file.File=/var/log/kafka/log.out
+log4j.appender.file.ImmediateFlush=true
+log4j.appender.file.Threshold=debug
+log4j.appender.file.Append=false
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern=[%d] %p %m (%c)%n
+
 {% if env['CONNECT_LOG4J_LOGGERS'] %}
 {% set loggers = parse_log4j_loggers(env['CONNECT_LOG4J_LOGGERS']) %}
 {% for logger,loglevel in loggers.iteritems() %}
-log4j.logger.{{logger}}={{loglevel}}
+log4j.logger.{{logger}}={{loglevel}}, stdout
 {% endfor %}
 {% endif %}
